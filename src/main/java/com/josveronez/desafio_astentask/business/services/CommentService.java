@@ -1,0 +1,70 @@
+package com.josveronez.desafio_astentask.business.services;
+
+import com.josveronez.desafio_astentask.business.dto.CommentRequestDTO;
+import com.josveronez.desafio_astentask.business.dto.CommentResponseDTO;
+import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
+import com.josveronez.desafio_astentask.business.mappers.CommentMapper;
+import com.josveronez.desafio_astentask.domain.entities.Comment;
+import com.josveronez.desafio_astentask.domain.entities.Task;
+import com.josveronez.desafio_astentask.domain.entities.User;
+import com.josveronez.desafio_astentask.domain.repositories.CommentRepository;
+import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
+import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CommentService {
+
+    private final CommentRepository commentRepository;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+
+    public CommentService(TaskRepository taskRepository, CommentRepository commentRepository, UserRepository userRepository) {
+        this.taskRepository = taskRepository;
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+    }
+
+    public CommentResponseDTO save(CommentRequestDTO request) {
+        Task task = taskRepository.findById(request.taskId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada."));
+
+        User author = userRepository.findById(request.authorId())
+               .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        Comment comment = CommentMapper.toEntity(request, task, author);
+
+        return CommentMapper.toResponseDTO(commentRepository.save(comment));
+
+    }
+
+    public List<CommentResponseDTO> findByTaskId(Long taskId){
+        if(!taskRepository.existsById(taskId)){
+            throw new ResourceNotFoundException("Tarefa não encontrada.");
+        }
+        return commentRepository.findByTaskId(taskId).stream()
+                .map(CommentMapper::toResponseDTO)
+                .toList();
+    }
+
+    public CommentResponseDTO updateById(Long id, CommentRequestDTO request){
+        Comment commentToUpdate = commentRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Comentário não encontrado.")
+                );
+        if (request.content() != null){
+            commentToUpdate.setContent(request.content());
+        }
+        return CommentMapper.toResponseDTO(commentRepository.save(commentToUpdate));
+    }
+
+    public void deleteById(Long id){
+        if (!commentRepository.existsById(id)){
+            throw new ResourceNotFoundException("Comentário com id" + id + "não encontrado.");
+        }
+        commentRepository.deleteById(id);
+    }
+
+}
