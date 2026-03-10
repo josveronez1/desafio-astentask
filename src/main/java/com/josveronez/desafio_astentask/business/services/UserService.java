@@ -7,6 +7,7 @@ import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundExce
 import com.josveronez.desafio_astentask.business.mappers.UserMapper;
 import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,8 +16,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponseDTO save(UserRequestDTO requestDTO){
@@ -24,6 +28,9 @@ public class UserService {
             throw new ConflictException("O email " + requestDTO.email() + "já está em uso.");
         }
         User user = UserMapper.toEntity(requestDTO);
+
+        user.setPassword(this.passwordEncoder.encode(requestDTO.password()));
+
         User savedUser = userRepository.save(user);
         return UserMapper.toResponseDTO(savedUser);
     }
