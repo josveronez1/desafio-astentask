@@ -27,8 +27,8 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    public CommentResponseDTO save(CommentRequestDTO request) {
-        Task task = taskRepository.findById(request.taskId())
+    public CommentResponseDTO save(Long taskId, CommentRequestDTO request) {
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada."));
 
         User author = userRepository.findById(request.authorId())

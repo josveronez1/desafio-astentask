@@ -1,0 +1,45 @@
+package com.josveronez.desafio_astentask.infrastructure.controllers;
+
+import com.josveronez.desafio_astentask.business.dto.TimeLogRequestDTO;
+import com.josveronez.desafio_astentask.business.dto.TimeLogResponseDTO;
+import com.josveronez.desafio_astentask.business.services.TimeLogService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+public class TimeLogController {
+
+    private final TimeLogService timeLogService;
+    public TimeLogController(TimeLogService timeLogService){
+        this.timeLogService = timeLogService;
+    }
+
+
+    @GetMapping("/tasks/{taskId}/timelogs")
+    public ResponseEntity<List<TimeLogResponseDTO>> findByTask(@PathVariable Long taskId) {
+        return ResponseEntity.ok(timeLogService.findByTaskId(taskId));
+    }
+
+    @PostMapping("/tasks/{taskId}/timelogs")
+    public ResponseEntity<TimeLogResponseDTO> create(@PathVariable Long taskId, @RequestBody TimeLogRequestDTO request) {
+        TimeLogResponseDTO response = timeLogService.save(taskId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/timelogs/{id}")
+    public ResponseEntity<TimeLogResponseDTO> updatedById(@PathVariable Long id, @RequestBody TimeLogRequestDTO request) {
+        TimeLogResponseDTO response = timeLogService.update(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/timelogs/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        timeLogService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+}

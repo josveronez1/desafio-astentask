@@ -23,9 +23,9 @@ public class CommentController {
         return ResponseEntity.ok(commentService.findByTaskId(taskId));
     }
 
-    @PostMapping("/tasks/{taskId/comments}")
+    @PostMapping("/tasks/{taskId}/comments")
     public ResponseEntity<CommentResponseDTO> create(@PathVariable Long taskId, @RequestBody CommentRequestDTO request) {
-        CommentResponseDTO response = commentService.save(request);
+        CommentResponseDTO response = commentService.save(taskId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
