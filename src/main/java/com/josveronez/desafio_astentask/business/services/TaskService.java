@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.TaskRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
+import com.josveronez.desafio_astentask.business.exceptions.ExternalAPIException;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.TaskMapper;
 import com.josveronez.desafio_astentask.domain.entities.Project;
@@ -12,6 +13,9 @@ import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,14 +24,18 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final BrasilApiService brasilApiService;
 
-    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, UserRepository userRepository, BrasilApiService brasilApiService) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.brasilApiService = brasilApiService;
     }
 
     public TaskResponseDTO save(TaskRequestDTO request) {
+        validateDueDate(request.dueDate());
+
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado."));
 
@@ -39,7 +47,7 @@ public class TaskService {
 
         Task task = TaskMapper.toEntity(request, project, assignee, reporter);
 
-        if (task.getStatus() != null){
+        if (task.getStatus() == null){
             task.setStatus(TaskStatus.PENDING);
         }
 
@@ -80,6 +88,10 @@ public class TaskService {
         if (request.status() != null){
             taskToUpdate.setStatus(request.status());
         }
+        if (request.dueDate() != null) {
+            validateDueDate(request.dueDate());
+            taskToUpdate.setDueDate(request.dueDate());
+        }
         return TaskMapper.toResponseDTO(taskRepository.save(taskToUpdate));
     }
 
@@ -105,6 +117,22 @@ public class TaskService {
             throw new ResourceNotFoundException("Tarefa com ID" + id + "não encontrada.");
         }
         taskRepository.deleteById(id);
+    }
+
+    private void validateDueDate(LocalDateTime dueDate) {
+        if (dueDate == null){
+            return;
+        }
+
+        LocalDate taskDate = dueDate.toLocalDate();
+        int ano = taskDate.getYear();
+
+        boolean isHoliday = brasilApiService.buscarFeriados(ano).stream()
+                .anyMatch(feriado -> feriado.date().equals(taskDate));
+
+        if (isHoliday) {
+            throw new ExternalAPIException("Operação cancelada: a data informada (" + taskDate + ") é um feriado.");
+        }
     }
 
 }
