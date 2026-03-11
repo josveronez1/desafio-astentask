@@ -7,6 +7,8 @@ import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundExce
 import com.josveronez.desafio_astentask.business.mappers.UserMapper;
 import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -84,5 +86,19 @@ public class UserService {
             throw new ResourceNotFoundException("Usuário com ID" + id + "não encontrado.");
         }
         userRepository.deleteById(id);
+    }
+
+    public User getAuthenticatedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        return userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário autenticado não encontrado."));
     }
 }
