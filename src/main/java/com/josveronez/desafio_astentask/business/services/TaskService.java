@@ -5,9 +5,11 @@ import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ExternalAPIException;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.TaskMapper;
+import com.josveronez.desafio_astentask.business.specifications.TaskSpecifications;
 import com.josveronez.desafio_astentask.domain.entities.Project;
 import com.josveronez.desafio_astentask.domain.entities.Task;
 import com.josveronez.desafio_astentask.domain.entities.User;
+import com.josveronez.desafio_astentask.domain.enums.TaskPriority;
 import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
 import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
@@ -134,6 +136,21 @@ public class TaskService {
         if (isHoliday) {
             throw new ExternalAPIException("Operação cancelada: a data informada (" + taskDate + ") é um feriado.");
         }
+    }
+
+    public Page<TaskResponseDTO> searchTasks(
+            TaskStatus status,
+            TaskPriority priority,
+            Long assigneeId,
+            Long projectId,
+            LocalDateTime dueDateFrom,
+            LocalDateTime dueDateTo,
+            Pageable pageable
+    ) {
+        var spec = TaskSpecifications.filterTasks(status, priority, assigneeId, projectId, dueDateFrom, dueDateTo);
+
+        return taskRepository.findAll(spec, pageable)
+                .map(TaskMapper::toResponseDTO);
     }
 
 }

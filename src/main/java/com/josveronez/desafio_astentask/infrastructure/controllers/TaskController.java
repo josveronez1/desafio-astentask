@@ -3,17 +3,22 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 import com.josveronez.desafio_astentask.business.dto.TaskRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
 import com.josveronez.desafio_astentask.business.services.TaskService;
+import com.josveronez.desafio_astentask.domain.enums.TaskPriority;
 import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -36,6 +41,30 @@ public class TaskController {
             @PathVariable Long projectId,
             @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         return ResponseEntity.ok(taskService.findAllByProjectId(projectId, pageable));
+    }
+
+    @Operation(summary = "Buscar tarefas com filtros avançados",
+            description = "Filtra por status, prioridade, assignee, projeto e intervalo de dueDate.")
+    @ApiResponse(responseCode = "200", description = "Página de tarefas filtradas.")
+    @GetMapping("/tasks/search")
+    public ResponseEntity<Page<TaskResponseDTO>> searchTasks(
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) TaskPriority priority,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) Long projectId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime dueDateFrom,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime dueDateTo,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdAt")
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                taskService.searchTasks(status, priority, assigneeId, projectId, dueDateFrom, dueDateTo, pageable)
+        );
     }
 
     @Operation(summary = "Criar tarefa"
