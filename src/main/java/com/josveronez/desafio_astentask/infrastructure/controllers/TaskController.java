@@ -26,7 +26,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @Operation(summary = "Lista todas as tarefas de um projeto")
+    @Operation(summary = "Lista tarefas de um projeto")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Página de tarefas recuperada com sucesso."),
             @ApiResponse(responseCode = "404", description = "Projeto não encontrado.")
@@ -38,7 +38,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findAllByProjectId(projectId, pageable));
     }
 
-    @Operation(summary = "Cria uma nova tarefa"
+    @Operation(summary = "Criar tarefa"
     , description = "Cria uma nova tarefa para um projeto + Verifica se a data não cai em nenhum feriado.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Tarefa criada com sucesso"),
@@ -50,7 +50,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Busca uma tarefa por ID")
+    @Operation(summary = "Detalhes da tarefa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tarefa encontrada"),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
@@ -60,7 +60,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findById(id));
     }
 
-    @Operation(summary = "Atualiza uma tarefa por ID")
+    @Operation(summary = "Atualizar tarefa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tarefa atualizada com sucesso"),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
@@ -70,7 +70,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateById(id, request));
     }
 
-    @Operation(summary = "Deleta uma tarefa por ID")
+    @Operation(summary = "Deletar tarefa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Tarefa deletada com sucesso"),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
@@ -81,7 +81,7 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Atualiza o status de uma tarefa")
+    @Operation(summary = "Alterar status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Status da tarefa atualizado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
@@ -92,9 +92,9 @@ public class TaskController {
     }
 
 
-    @Operation
+    @Operation(summary = "Atribuir usuário")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário assignado com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Usuário atribuido com sucesso"),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
     })
     @PutMapping("/tasks/{id}/assign")

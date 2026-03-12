@@ -21,27 +21,27 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @Operation(summary = "Listar comentários de uma tarefa")
+    @Operation(summary = "Listar comentários")
     @GetMapping("/tasks/{taskId}/comments")
     public ResponseEntity<List<CommentResponseDTO>> findByTask(@PathVariable Long taskId) {
         return ResponseEntity.ok(commentService.findByTaskId(taskId));
     }
 
-    @Operation(summary = "Adicionar comentário em uma tarefa")
+    @Operation(summary = "Adicionar comentário")
     @PostMapping("/tasks/{taskId}/comments")
     public ResponseEntity<CommentResponseDTO> create(@PathVariable Long taskId, @RequestBody CommentRequestDTO request) {
         CommentResponseDTO response = commentService.save(taskId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Editar um comentário")
+    @Operation(summary = "Editar comentário")
     @PutMapping("/comments/{id}")
     public ResponseEntity<CommentResponseDTO> updateById(@PathVariable Long id, @RequestBody CommentRequestDTO request) {
         CommentResponseDTO response = commentService.updateById(id, request);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Deletar um comentário")
+    @Operation(summary = "Deletar comentário")
     @DeleteMapping("/comments/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
         commentService.deleteById(id);

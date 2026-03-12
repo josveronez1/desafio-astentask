@@ -23,32 +23,32 @@ public class ProjectController {
     }
 
 
-    @Operation(summary = "Criar um novo projeto")
-    @PostMapping
-    public ResponseEntity<ProjectResponseDTO> save(@RequestBody ProjectRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.save(request));
-    }
-
-    @Operation(summary = "Listar projetos por usuário")
+    @Operation(summary = "Listar projetos do usuário")
     @GetMapping
     public ResponseEntity<List<ProjectResponseDTO>> findByOwnerId(@RequestParam Long userId) {
         return ResponseEntity.ok(projectService.findByOwnerId(userId));
     }
 
-    @Operation(summary = "Buscar projeto por ID")
+    @Operation(summary = "Criar projeto")
+    @PostMapping
+    public ResponseEntity<ProjectResponseDTO> save(@RequestBody ProjectRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.save(request));
+    }
+
+    @Operation(summary = "Detalhes do projeto")
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(projectService.findById(id));
     }
 
-    @Operation(summary = "Atualizar um projeto existente")
+    @Operation(summary = "Atualizar projeto")
     @PutMapping("/{id}")
     public ResponseEntity<ProjectResponseDTO> updateById(@PathVariable Long id, @RequestBody ProjectRequestDTO request) {
         ProjectResponseDTO response = projectService.updateById(id, request);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Excluir um projeto")
+    @Operation(summary = "Deletar projeto")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
         projectService.deleteById(id);
@@ -56,5 +56,4 @@ public class ProjectController {
     }
 
     //Falta criar estatísticas
-
 }

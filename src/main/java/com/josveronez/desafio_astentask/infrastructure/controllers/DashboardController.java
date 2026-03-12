@@ -24,13 +24,13 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @Operation(summary = "Busca métricas gerais do usuário logado", description = "Retorna contagem de tarefas por status, total de horas e projetos.")
+    @Operation(summary = "Visão geral do usuário")
     @GetMapping("/overview")
     public ResponseEntity<DashboardOverviewDTO> getOverview() {
         return ResponseEntity.ok(dashboardService.getOverview());
     }
 
-    @Operation(summary = "Lista tarefas atribuídas ao usuário logado", description = "Retorna uma página de tarefas com informações resumidas para o dashboard.")
+    @Operation(summary = "Tarefas atribuídas ao usuário")
     @GetMapping("/my-tasks")
     public ResponseEntity<Page<MyTasksDTO>> getMyTasks(@PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(dashboardService.getMyTasks(pageable));

@@ -22,27 +22,27 @@ public class TimeLogController {
     }
 
 
-    @Operation(summary = "Listar registros de tempo por tarefa")
+    @Operation(summary = "Listar registros de tempo")
     @GetMapping("/tasks/{taskId}/timelogs")
     public ResponseEntity<List<TimeLogResponseDTO>> findByTask(@PathVariable Long taskId) {
         return ResponseEntity.ok(timeLogService.findByTaskId(taskId));
     }
 
-    @Operation(summary = "Registrar tempo para uma tarefa")
+    @Operation(summary = "Registrar tempo")
     @PostMapping("/tasks/{taskId}/timelogs")
     public ResponseEntity<TimeLogResponseDTO> create(@PathVariable Long taskId, @RequestBody TimeLogRequestDTO request) {
         TimeLogResponseDTO response = timeLogService.save(taskId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Atualizar um registro de tempo existente")
+    @Operation(summary = "Atualizar registro")
     @PutMapping("/timelogs/{id}")
     public ResponseEntity<TimeLogResponseDTO> updatedById(@PathVariable Long id, @RequestBody TimeLogRequestDTO request) {
         TimeLogResponseDTO response = timeLogService.update(id, request);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Excluir um registro de tempo")
+    @Operation(summary = "Deletar registro")
     @DeleteMapping("/timelogs/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         timeLogService.deleteById(id);

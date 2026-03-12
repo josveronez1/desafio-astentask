@@ -35,13 +35,51 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        // admin gerencia usuarios
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                        // admin e project_manager gerenciam projetos
+                        .requestMatchers(HttpMethod.POST, "/api/projects/**").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/projects/**").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/projects/**").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+
+                        // todos visualizam projetos
+                        .requestMatchers(HttpMethod.GET, "/api/projects/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
+                        //listar tarefas de projeto e detalhes da tarefa - qualquer usuario autenticado
+                        .requestMatchers(HttpMethod.GET,  "/api/projects/*/tasks","/api/tasks/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
+                        //admin project manager e developer gerenciam tarefas
+                        .requestMatchers(HttpMethod.POST, "/api/projects/*/tasks").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/**").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+
+                        //listar comentarios de tarefa - qualquer usuario autenticado
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
+                        //gerenciar comentarios - admin projectmanager e developer
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/comments/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+
+                        //listar timelogs - qualquer autenticado
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/timelogs").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
+                        //gerenciar timelogs - admin projectmanager e developer
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/timelogs").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/timelogs/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/timelogs/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+
+                        //dashboard - qualquer autenticado
+                        .requestMatchers("/api/dashboard/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
+                        //outras rotas
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider());
