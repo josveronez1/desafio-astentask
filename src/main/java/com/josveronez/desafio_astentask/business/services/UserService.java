@@ -80,6 +80,10 @@ public class UserService {
             userToUpdate.setRole(request.role());
         }
 
+        if (request.password() != null && !request.password().isBlank()) {
+            userToUpdate.setPassword(passwordEncoder.encode(request.password()));
+        }
+
         User updatedUser = userRepository.save(userToUpdate);
         return UserMapper.toResponseDTO(updatedUser);
     }

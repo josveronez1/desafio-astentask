@@ -96,6 +96,10 @@ public class TaskService {
             validateDueDate(request.dueDate());
             taskToUpdate.setDueDate(request.dueDate());
         }
+        if (request.estimatedHours() != null) {
+            taskToUpdate.setEstimatedHours(request.estimatedHours());
+        }
+
         return TaskMapper.toResponseDTO(taskRepository.save(taskToUpdate));
     }
 
