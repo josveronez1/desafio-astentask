@@ -7,6 +7,8 @@ import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundExce
 import com.josveronez.desafio_astentask.business.mappers.UserMapper;
 import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,11 +53,11 @@ public class UserService {
         return UserMapper.toResponseDTO(user);
     }
 
-    public List<UserResponseDTO> findAll(){
-        return userRepository.findAll()
-                .stream()
-                .map(UserMapper::toResponseDTO)
-                .toList();
+    public Page<UserResponseDTO> findAll(
+            Pageable pageable
+    ) {
+        return userRepository.findAll(pageable)
+                .map(UserMapper::toResponseDTO);
     }
 
     // Atualiza usuário + mantém os campos, caso vierem nulos (ex: se atualizar só o email, muda o email e mantem os outros campos.)

@@ -9,6 +9,8 @@ import com.josveronez.desafio_astentask.domain.entities.Project;
 import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,16 +44,13 @@ public class ProjectService {
         return ProjectMapper.toResponseDTO(project);
     }
 
-    public List<ProjectResponseDTO> findByOwnerId(Long userId) {
+    public Page<ProjectResponseDTO> findByOwnerId(Long userId, Pageable pageable) {
         //validar se userid existe
         if(!userRepository.existsById(userId)){
             throw new ResourceNotFoundException("Usuário não encontrado.");
         }
-
-        return projectRepository.findByOwnerId(userId)
-                .stream()
-                .map(ProjectMapper::toResponseDTO)
-                .toList();
+        return projectRepository.findByOwnerId(userId, pageable)
+                .map(ProjectMapper::toResponseDTO);
     }
 
     public ProjectResponseDTO updateById(Long id, ProjectRequestDTO request) {

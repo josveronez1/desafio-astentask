@@ -3,6 +3,9 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 import com.josveronez.desafio_astentask.business.dto.UserRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.UserResponseDTO;
 import com.josveronez.desafio_astentask.business.services.UserService;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,12 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<Page<UserResponseDTO>> findAll(
+            @ParameterObject
+            @PageableDefault(size = 20, sort = "name")
+            org.springframework.data.domain.Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

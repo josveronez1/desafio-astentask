@@ -10,6 +10,8 @@ import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TimeLogRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,14 +41,13 @@ public class TimeLogService {
         return TimeLogMapper.toResponseDTO(timeLogRepository.save(timelog));
     }
 
-    public List<TimeLogResponseDTO> findByTaskId(Long taskId){
+    public Page<TimeLogResponseDTO> findByTaskId(Long taskId, Pageable pageable) {
         if(!taskRepository.existsById(taskId)){
             throw new ResourceNotFoundException("Tarefa não encontrada.");
         }
 
-        return timeLogRepository.findByTaskId(taskId).stream()
-                .map(TimeLogMapper::toResponseDTO)
-                .toList();
+        return timeLogRepository.findByTaskId(taskId, pageable)
+                .map(TimeLogMapper::toResponseDTO);
     }
 
     public TimeLogResponseDTO update(Long id, TimeLogRequestDTO request){

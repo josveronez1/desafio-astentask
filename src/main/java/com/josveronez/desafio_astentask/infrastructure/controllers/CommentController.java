@@ -5,11 +5,14 @@ import com.josveronez.desafio_astentask.business.dto.CommentResponseDTO;
 import com.josveronez.desafio_astentask.business.services.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -23,8 +26,9 @@ public class CommentController {
 
     @Operation(summary = "Listar comentários")
     @GetMapping("/tasks/{taskId}/comments")
-    public ResponseEntity<List<CommentResponseDTO>> findByTask(@PathVariable Long taskId) {
-        return ResponseEntity.ok(commentService.findByTaskId(taskId));
+    public ResponseEntity<Page<CommentResponseDTO>> findByTask(@PathVariable Long taskId,
+                                                               @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(commentService.findByTaskId(taskId, pageable));
     }
 
     @Operation(summary = "Adicionar comentário")

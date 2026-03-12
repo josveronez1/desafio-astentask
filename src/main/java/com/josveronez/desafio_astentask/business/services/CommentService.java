@@ -10,6 +10,8 @@ import com.josveronez.desafio_astentask.domain.entities.User;
 import com.josveronez.desafio_astentask.domain.repositories.CommentRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,13 +42,12 @@ public class CommentService {
 
     }
 
-    public List<CommentResponseDTO> findByTaskId(Long taskId){
+    public Page<CommentResponseDTO> findByTaskId(Long taskId, Pageable pageable) {
         if(!taskRepository.existsById(taskId)){
             throw new ResourceNotFoundException("Tarefa não encontrada.");
         }
-        return commentRepository.findByTaskId(taskId).stream()
-                .map(CommentMapper::toResponseDTO)
-                .toList();
+        return commentRepository.findByTaskId(taskId, pageable)
+                .map(CommentMapper::toResponseDTO);
     }
 
     public CommentResponseDTO updateById(Long id, CommentRequestDTO request){

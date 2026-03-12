@@ -6,6 +6,10 @@ import com.josveronez.desafio_astentask.business.dto.ProjectResponseDTO;
 import com.josveronez.desafio_astentask.business.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +29,13 @@ public class ProjectController {
 
     @Operation(summary = "Listar projetos do usuário")
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>> findByOwnerId(@RequestParam Long userId) {
-        return ResponseEntity.ok(projectService.findByOwnerId(userId));
+    public ResponseEntity<Page<ProjectResponseDTO>> findByOwnerId(
+            @RequestParam Long userId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdAt")
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(projectService.findByOwnerId(userId, pageable));
     }
 
     @Operation(summary = "Criar projeto")

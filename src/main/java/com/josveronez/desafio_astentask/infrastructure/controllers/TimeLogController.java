@@ -5,6 +5,10 @@ import com.josveronez.desafio_astentask.business.dto.TimeLogResponseDTO;
 import com.josveronez.desafio_astentask.business.services.TimeLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +28,10 @@ public class TimeLogController {
 
     @Operation(summary = "Listar registros de tempo")
     @GetMapping("/tasks/{taskId}/timelogs")
-    public ResponseEntity<List<TimeLogResponseDTO>> findByTask(@PathVariable Long taskId) {
-        return ResponseEntity.ok(timeLogService.findByTaskId(taskId));
+    public ResponseEntity<Page<TimeLogResponseDTO>> findByTask(@PathVariable Long taskId,
+                                                               @ParameterObject
+                                                               @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(timeLogService.findByTaskId(taskId, pageable));
     }
 
     @Operation(summary = "Registrar tempo")
