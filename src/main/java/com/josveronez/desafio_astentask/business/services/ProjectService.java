@@ -1,19 +1,19 @@
 package com.josveronez.desafio_astentask.business.services;
 
 
-import com.josveronez.desafio_astentask.business.dto.ProjectRequestDTO;
-import com.josveronez.desafio_astentask.business.dto.ProjectResponseDTO;
-import com.josveronez.desafio_astentask.business.dto.ProjectUpdateDTO;
+import com.josveronez.desafio_astentask.business.dto.*;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.ProjectMapper;
 import com.josveronez.desafio_astentask.domain.entities.Project;
+import com.josveronez.desafio_astentask.domain.entities.Task;
 import com.josveronez.desafio_astentask.domain.entities.User;
-import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
-import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
+import com.josveronez.desafio_astentask.domain.repositories.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,10 +21,16 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
+    private final CommentRepository commentRepository;
+    private final TimeLogRepository timeLogRepository;
 
-    public ProjectService (ProjectRepository projectRepository, UserRepository userRepository) {
+    public ProjectService (ProjectRepository projectRepository, UserRepository userRepository, TaskRepository taskRepository, CommentRepository commentRepository, TimeLogRepository timeLogRepository) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
+        this.commentRepository = commentRepository;
+        this.timeLogRepository = timeLogRepository;
     }
 
     public ProjectResponseDTO save(ProjectRequestDTO request) {
@@ -88,5 +94,40 @@ public class ProjectService {
         projectRepository.deleteById(id);
     }
 
+    public ProjectStatsDTO getProjectStats(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ResourceNotFoundException("Nenhum projeto com esse id.")
+        );
+        long totalTasks = taskRepository.countByProjectId(projectId);
+        long pendingTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.PENDING);
+        long inProgressTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.IN_PROGRESS);
+        long completedTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.COMPLETED);
+        Double hours = timeLogRepository.sumHoursWorkedByProjectId(projectId);
+        double totalHoursLogged = hours != null ? hours : 0.0;
+
+        return new ProjectStatsDTO(project.getId(), project.getName(), totalTasks, pendingTasks, inProgressTasks, completedTasks, totalHoursLogged);
+    }
+
+    public ProjectReportDTO getProjectReport(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhum projeto com esse id."));
+        List<Task> tasks = taskRepository.findByProjectId(projectId, Pageable.unpaged()).getContent();
+        long totalTasks = tasks.size();
+        long totalComments = 0;
+        List<ProjectReportDTO.TaskSummaryDTO> taskSummaries = new ArrayList<>();
+        for (Task task : tasks) {
+            Long commentCount = commentRepository.countByTaskId(task.getId());
+            totalComments += (commentCount != null ? commentCount : 0);
+            Double taskHours = timeLogRepository.sumHoursWorkedByTaskId(task.getId());
+            double hoursLogged = taskHours != null ? taskHours : 0.0;
+            String assigneeName = task.getAssignee() != null ? task.getAssignee().getName() : "Não atribuído";
+            int comments = commentCount != null ? commentCount.intValue() : 0;
+            taskSummaries.add(new ProjectReportDTO.TaskSummaryDTO(task.getId(), task.getTitle(), task.getStatus(), assigneeName, comments, hoursLogged
+            ));
+        }
+        Double totalHoursLogged = timeLogRepository.sumHoursWorkedByProjectId(projectId);
+        double totalHours = totalHoursLogged != null ? totalHoursLogged : 0.0;
+        return new ProjectReportDTO(project.getId(), project.getName(), project.getStatus().name(), totalTasks, totalComments, totalHours, taskSummaries);
+    }
 
 }

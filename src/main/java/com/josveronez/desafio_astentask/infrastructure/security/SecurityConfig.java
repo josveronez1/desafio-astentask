@@ -79,6 +79,9 @@ public class SecurityConfig {
                         //dashboard - qualquer autenticado
                         .requestMatchers("/api/dashboard/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
 
+                        // relatórios
+                        .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+
                         //outras rotas
                         .anyRequest().authenticated()
                 )

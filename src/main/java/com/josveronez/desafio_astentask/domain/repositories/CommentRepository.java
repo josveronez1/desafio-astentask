@@ -13,5 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Page<Comment> findByTaskId(Long taskId, Pageable pageable);
 
+    Long countByTaskId(Long taskId);
+
 
 }

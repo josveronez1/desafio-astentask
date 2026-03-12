@@ -15,4 +15,10 @@ public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
 
     @Query("SELECT SUM(tl.hoursWorked) FROM TimeLog tl WHERE tl.user.id = :userId")
     Double sumHoursWorkedByUserId(Long userId);
+
+    @Query("SELECT COALESCE(SUM(tl.hoursWorked), 0) FROM TimeLog tl WHERE tl.task.project.id = :projectId")
+    Double sumHoursWorkedByProjectId(Long projectId);
+
+    @Query("SELECT COALESCE(SUM(tl.hoursWorked), 0) FROM TimeLog tl WHERE tl.task.id = :taskId")
+    Double sumHoursWorkedByTaskId(Long taskId);
 }

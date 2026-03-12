@@ -1,9 +1,7 @@
 package com.josveronez.desafio_astentask.infrastructure.controllers;
 
 
-import com.josveronez.desafio_astentask.business.dto.ProjectRequestDTO;
-import com.josveronez.desafio_astentask.business.dto.ProjectResponseDTO;
-import com.josveronez.desafio_astentask.business.dto.ProjectUpdateDTO;
+import com.josveronez.desafio_astentask.business.dto.*;
 import com.josveronez.desafio_astentask.business.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,5 +64,10 @@ public class ProjectController {
         return ResponseEntity.noContent().build();
     }
 
-    //Falta criar estatísticas
+    @Operation(summary = "Estatísticas do projeto")
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<ProjectStatsDTO> getStats(@PathVariable Long id) {
+        return ResponseEntity.ok(projectService.getProjectStats(id));
+    }
+
 }
