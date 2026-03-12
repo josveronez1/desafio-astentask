@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.TimeLogRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TimeLogResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.TimeLogUpdateDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.TimeLogMapper;
 import com.josveronez.desafio_astentask.domain.entities.Task;
@@ -50,7 +51,7 @@ public class TimeLogService {
                 .map(TimeLogMapper::toResponseDTO);
     }
 
-    public TimeLogResponseDTO update(Long id, TimeLogRequestDTO request){
+    public TimeLogResponseDTO update(Long id, TimeLogUpdateDTO request){
         TimeLog timeLogToUpdate = timeLogRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Registro não encontrado.")

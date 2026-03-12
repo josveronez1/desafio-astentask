@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.TaskRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.TaskUpdateDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ExternalAPIException;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.TaskMapper;
@@ -74,7 +75,7 @@ public class TaskService {
         return TaskMapper.toResponseDTO(task);
     }
 
-    public TaskResponseDTO updateById(Long id, TaskRequestDTO request){
+    public TaskResponseDTO updateById(Long id, TaskUpdateDTO request){
         Task taskToUpdate = taskRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Tarefa não encontrada.")

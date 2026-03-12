@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.UserRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.UserResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.UserUpdateDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ConflictException;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.UserMapper;
@@ -61,7 +62,7 @@ public class UserService {
     }
 
     // Atualiza usuário + mantém os campos, caso vierem nulos (ex: se atualizar só o email, muda o email e mantem os outros campos.)
-    public UserResponseDTO updateById(Long id, UserRequestDTO request){
+    public UserResponseDTO updateById(Long id, UserUpdateDTO request){
         User userToUpdate = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Nenhum usuário encontrado com esse id.")
         );

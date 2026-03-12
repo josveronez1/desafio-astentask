@@ -3,9 +3,11 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 
 import com.josveronez.desafio_astentask.business.dto.ProjectRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.ProjectResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.ProjectUpdateDTO;
 import com.josveronez.desafio_astentask.business.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +42,7 @@ public class ProjectController {
 
     @Operation(summary = "Criar projeto")
     @PostMapping
-    public ResponseEntity<ProjectResponseDTO> save(@RequestBody ProjectRequestDTO request) {
+    public ResponseEntity<ProjectResponseDTO> save(@RequestBody @Valid ProjectRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.save(request));
     }
 
@@ -52,7 +54,7 @@ public class ProjectController {
 
     @Operation(summary = "Atualizar projeto")
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> updateById(@PathVariable Long id, @RequestBody ProjectRequestDTO request) {
+    public ResponseEntity<ProjectResponseDTO> updateById(@PathVariable Long id, @RequestBody @Valid ProjectUpdateDTO request) {
         ProjectResponseDTO response = projectService.updateById(id, request);
         return ResponseEntity.ok(response);
     }

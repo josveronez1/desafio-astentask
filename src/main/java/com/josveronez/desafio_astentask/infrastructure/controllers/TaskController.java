@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 
 import com.josveronez.desafio_astentask.business.dto.TaskRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.TaskUpdateDTO;
 import com.josveronez.desafio_astentask.business.services.TaskService;
 import com.josveronez.desafio_astentask.domain.enums.TaskPriority;
 import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +76,7 @@ public class TaskController {
             @ApiResponse(responseCode = "400", description = "Erro de validação ou data em feriado"),
             @ApiResponse(responseCode = "404", description = "Projeto ou usuário não encontrado")})
     @PostMapping("/projects/{projectId}/tasks")
-    public ResponseEntity<TaskResponseDTO> create(@PathVariable Long projectId, @RequestBody TaskRequestDTO request) {
+    public ResponseEntity<TaskResponseDTO> create(@PathVariable Long projectId, @RequestBody @Valid TaskRequestDTO request) {
         TaskResponseDTO response = taskService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -95,7 +97,7 @@ public class TaskController {
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
     })
     @PutMapping("/tasks/{id}")
-    public ResponseEntity<TaskResponseDTO> updateById(@PathVariable Long id, @RequestBody TaskRequestDTO request) {
+    public ResponseEntity<TaskResponseDTO> updateById(@PathVariable Long id, @RequestBody @Valid TaskUpdateDTO request) {
         return ResponseEntity.ok(taskService.updateById(id, request));
     }
 

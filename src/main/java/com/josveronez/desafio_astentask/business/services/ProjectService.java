@@ -3,6 +3,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.ProjectRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.ProjectResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.ProjectUpdateDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.ProjectMapper;
 import com.josveronez.desafio_astentask.domain.entities.Project;
@@ -53,7 +54,7 @@ public class ProjectService {
                 .map(ProjectMapper::toResponseDTO);
     }
 
-    public ProjectResponseDTO updateById(Long id, ProjectRequestDTO request) {
+    public ProjectResponseDTO updateById(Long id, ProjectUpdateDTO request) {
         Project projectToUpdate = projectRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Nenhum projeto com esse id.")
         );

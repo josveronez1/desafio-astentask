@@ -2,6 +2,7 @@ package com.josveronez.desafio_astentask.business.services;
 
 import com.josveronez.desafio_astentask.business.dto.CommentRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.CommentResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.CommentUpdateDTO;
 import com.josveronez.desafio_astentask.business.exceptions.ResourceNotFoundException;
 import com.josveronez.desafio_astentask.business.mappers.CommentMapper;
 import com.josveronez.desafio_astentask.domain.entities.Comment;
@@ -50,7 +51,7 @@ public class CommentService {
                 .map(CommentMapper::toResponseDTO);
     }
 
-    public CommentResponseDTO updateById(Long id, CommentRequestDTO request){
+    public CommentResponseDTO updateById(Long id, CommentUpdateDTO request){
         Comment commentToUpdate = commentRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Comentário não encontrado.")

@@ -2,7 +2,9 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 
 import com.josveronez.desafio_astentask.business.dto.UserRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.UserResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.UserUpdateDTO;
 import com.josveronez.desafio_astentask.business.services.UserService;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO request) {
         UserResponseDTO response = userService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -42,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateById(@PathVariable Long id, @RequestBody UserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> updateById(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO request) {
         UserResponseDTO response = userService.updateById(id, request);
         return ResponseEntity.ok(response);
     }

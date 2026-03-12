@@ -2,9 +2,11 @@ package com.josveronez.desafio_astentask.infrastructure.controllers;
 
 import com.josveronez.desafio_astentask.business.dto.TimeLogRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TimeLogResponseDTO;
+import com.josveronez.desafio_astentask.business.dto.TimeLogUpdateDTO;
 import com.josveronez.desafio_astentask.business.services.TimeLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,14 +38,14 @@ public class TimeLogController {
 
     @Operation(summary = "Registrar tempo")
     @PostMapping("/tasks/{taskId}/timelogs")
-    public ResponseEntity<TimeLogResponseDTO> create(@PathVariable Long taskId, @RequestBody TimeLogRequestDTO request) {
+    public ResponseEntity<TimeLogResponseDTO> create(@PathVariable Long taskId, @RequestBody @Valid TimeLogRequestDTO request) {
         TimeLogResponseDTO response = timeLogService.save(taskId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Atualizar registro")
     @PutMapping("/timelogs/{id}")
-    public ResponseEntity<TimeLogResponseDTO> updatedById(@PathVariable Long id, @RequestBody TimeLogRequestDTO request) {
+    public ResponseEntity<TimeLogResponseDTO> updatedById(@PathVariable Long id, @RequestBody @Valid TimeLogUpdateDTO request) {
         TimeLogResponseDTO response = timeLogService.update(id, request);
         return ResponseEntity.ok(response);
     }
