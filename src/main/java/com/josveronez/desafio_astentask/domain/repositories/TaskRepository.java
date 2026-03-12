@@ -10,13 +10,9 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
 
-    List<Task> findByProjectId(Long projectId);
-
-    List<Task> findByAssigneeId(Long assigneeId);
+    Page<Task> findByProjectId(Long projectId, Pageable pageable);
 
     Page<Task> findByAssigneeId(Long assigneeId, Pageable pageable);
-
-    List<Task> findByProjectIdAndStatus(Long projectId, String status);
 
     long countByAssigneeId(Long userId);
 

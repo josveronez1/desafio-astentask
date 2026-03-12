@@ -12,6 +12,8 @@ import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
 import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -55,13 +57,12 @@ public class TaskService {
 
     }
 
-    public List<TaskResponseDTO> findAllByProjectId(Long projectId) {
+    public Page<TaskResponseDTO> findAllByProjectId(Long projectId, Pageable pageable) {
         if (!projectRepository.existsById(projectId)){
             throw new ResourceNotFoundException("Projeto não encontrado.");
         }
-        return taskRepository.findByProjectId(projectId).stream()
-                .map(TaskMapper::toResponseDTO)
-                .toList();
+        return taskRepository.findByProjectId(projectId, pageable)
+                .map(TaskMapper::toResponseDTO);
     }
 
     public TaskResponseDTO findById(Long id){

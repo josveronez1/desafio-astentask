@@ -4,7 +4,12 @@ import com.josveronez.desafio_astentask.business.dto.TaskRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.TaskResponseDTO;
 import com.josveronez.desafio_astentask.business.services.TaskService;
 import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
-import org.apache.coyote.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api")
+@Tag(name = "Tarefas", description = "Endpoints para gerenciamento de tarefas")
 public class TaskController {
 
     private final TaskService taskService;
@@ -20,39 +26,78 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("/api/projects/{projectId}/tasks")
-    public ResponseEntity<List<TaskResponseDTO>> findByProject(@PathVariable Long projectId) {
-        return ResponseEntity.ok(taskService.findAllByProjectId(projectId));
+    @Operation(summary = "Lista todas as tarefas de um projeto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de tarefas recuperada com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Projeto não encontrado.")
+    })
+    @GetMapping("/projects/{projectId}/tasks")
+    public ResponseEntity<Page<TaskResponseDTO>> findByProject(
+            @PathVariable Long projectId,
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(taskService.findAllByProjectId(projectId, pageable));
     }
 
-    @PostMapping("/api/projects/{projectId}/tasks")
+    @Operation(summary = "Cria uma nova tarefa"
+    , description = "Cria uma nova tarefa para um projeto + Verifica se a data não cai em nenhum feriado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Tarefa criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro de validação ou data em feriado"),
+            @ApiResponse(responseCode = "404", description = "Projeto ou usuário não encontrado")})
+    @PostMapping("/projects/{projectId}/tasks")
     public ResponseEntity<TaskResponseDTO> create(@PathVariable Long projectId, @RequestBody TaskRequestDTO request) {
         TaskResponseDTO response = taskService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{id}")
+    @Operation(summary = "Busca uma tarefa por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tarefa encontrada"),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
+    })
+    @GetMapping("/tasks/{id}")
     public ResponseEntity<TaskResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(taskService.findById(id));
     }
 
-    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza uma tarefa por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tarefa atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
+    })
+    @PutMapping("/tasks/{id}")
     public ResponseEntity<TaskResponseDTO> updateById(@PathVariable Long id, @RequestBody TaskRequestDTO request) {
         return ResponseEntity.ok(taskService.updateById(id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @Operation(summary = "Deleta uma tarefa por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Tarefa deletada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
+    })
+    @DeleteMapping("/tasks/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
         taskService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/status")
+    @Operation(summary = "Atualiza o status de uma tarefa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status da tarefa atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
+    })
+    @PutMapping("/tasks/{id}/status")
     public ResponseEntity<TaskResponseDTO> updateStatus(@PathVariable Long id, @RequestBody TaskStatus status) {
         return ResponseEntity.ok(taskService.updateStatus(id, status));
     }
 
-    @PutMapping("/{id}/assign")
+
+    @Operation
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário assignado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
+    })
+    @PutMapping("/tasks/{id}/assign")
     public ResponseEntity<TaskResponseDTO> assignUser(@PathVariable Long id, @RequestParam Long userId) {
         return ResponseEntity.ok(taskService.assignUser(id, userId));
     }
