@@ -129,12 +129,12 @@ SpringData JPA, Spring Web. (Buscando fugir o mínimo da stack indicada no desaf
 - Comecei pelo que já tinha domínio: Criação das entities, repositories, services e controllers.
 Poderia ter usado Lombok nas entities, mas prefiri escrever o código manualmente... Foi uma boa escolha nesse caso, pois gerou mais clareza para a criação das outras classes.
 
--Logo após isso, já percebi a necessidade de implementar os DTOs, então comecei a criar os DTOs e os mappers (não tinha muita experiência prática), o que causou necessidade de refatoração nos services.
+- Logo após isso, já percebi a necessidade de implementar os DTOs, então comecei a criar os DTOs e os mappers (não tinha muita experiência prática), o que causou necessidade de refatoração nos services.
 
 - Depois que já tinha os CRUDs de todas as entidades criados até o controller, decidi implementar o JWT auth, 
 outro conceito com o qual eu não tinha muita experiência e tive que aprender para conseguir utilizar.
 
-(Se eu fosse fazer esse projeto novamente, eu já teria começado implementando o JWT Auth e DTOs desde o começo, o que evitaria refatoração.)
+  (Se eu fosse fazer esse projeto novamente, eu já teria começado implementando o JWT Auth e DTOs desde o começo, o que evitaria refatoração.)
 
 - Após isso, configurei o banco de dados PostgreSQL, utilizando o docker para facilitar.
 
