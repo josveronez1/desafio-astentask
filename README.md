@@ -44,7 +44,6 @@ Serviços:
 
 A aplicação já está configurada para usar esse banco (ver `application.properties`).
 
-> **Observação:** se você já tiver um PostgreSQL local usando a porta `5432`, pare esse serviço ou altere a porta local. O compose espera ficar com a `5432` livre para o container `db`.
 
 ## Como rodar a aplicação
 
@@ -54,15 +53,7 @@ A aplicação já está configurada para usar esse banco (ver `application.prope
    docker compose ps
    ```
 
-2. (Opcional) Configure a variável de ambiente do JWT:
-
-   ```bash
-   export JWT_SECRET=sua-chave-secreta
-   ```
-
-   Se não definir, é usado o valor padrão do `application.properties`.
-
-3. Execute a aplicação:
+2. Execute a aplicação:
 
    Linux / Mac:
    ```bash
@@ -74,7 +65,7 @@ A aplicação já está configurada para usar esse banco (ver `application.prope
    mvnw.cmd spring-boot:run
    ```
    
-4. Acesse o pgAdmin e cadastre um novo server:
+3. Acesse o pgAdmin e cadastre um novo server:
     Host name / address: db
     Port: 5432
     Username: postgres
