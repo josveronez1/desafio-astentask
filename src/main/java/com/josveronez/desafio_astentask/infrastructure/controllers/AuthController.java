@@ -10,6 +10,8 @@ import com.josveronez.desafio_astentask.infrastructure.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Autenticação", description = "Endpoints de autenticação")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final UserService userService;
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
@@ -35,6 +38,8 @@ public class AuthController {
     @Operation(summary = "Registrar um usuário")
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody @Valid UserRequestDTO request) {
+        UserResponseDTO saved = userService.save(request);
+        log.info("event=user_registered email={} userId={}", request.email(), saved.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
 
@@ -44,6 +49,7 @@ public class AuthController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
+        log.info("event=login_success email={}", data.email());
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
@@ -51,13 +57,16 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDTO> refresh(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {
+            log.warn("event=refresh_failed reason=missing_or_invalid_header");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String oldToken = authorization.substring(7);
         String newToken = tokenService.refreshToken(oldToken);
         if (newToken == null) {
+            log.warn("event=refresh_failed reason=invalid_or_revoked_token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        log.info("event=token_refreshed");
         return ResponseEntity.ok(new LoginResponseDTO(newToken));
     }
 
@@ -67,6 +76,7 @@ public class AuthController {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7);
             tokenService.revokeToken(token);
+            log.info("event=logout_success");
         }
         return ResponseEntity.noContent().build();
     }

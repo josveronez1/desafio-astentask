@@ -15,6 +15,8 @@ import com.josveronez.desafio_astentask.domain.enums.TaskStatus;
 import com.josveronez.desafio_astentask.domain.repositories.ProjectRepository;
 import com.josveronez.desafio_astentask.domain.repositories.TaskRepository;
 import com.josveronez.desafio_astentask.domain.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import java.util.List;
 
 @Service
 public class TaskService {
+
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
@@ -90,7 +94,11 @@ public class TaskService {
             taskToUpdate.setPriority(request.priority());
         }
         if (request.status() != null){
+            TaskStatus oldStatus = taskToUpdate.getStatus();
             taskToUpdate.setStatus(request.status());
+            if (oldStatus != request.status()) {
+                log.info("event=task_status_changed taskId={} oldStatus={} newStatus={}", id, oldStatus, request.status());
+            }
         }
         if (request.dueDate() != null) {
             validateDueDate(request.dueDate());
@@ -107,6 +115,7 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada."));
         task.setStatus(status);
+        log.info("event=task_status_changed taskId={} status={}", id, status);
         return TaskMapper.toResponseDTO(taskRepository.save(task));
     }
 
@@ -117,6 +126,7 @@ public class TaskService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
         task.setAssignee(user);
+        log.info("event=task_assigned taskId={} userId={} assigneeEmail={}", id, userId, user.getEmail());
         return TaskMapper.toResponseDTO(taskRepository.save(task));
     }
 

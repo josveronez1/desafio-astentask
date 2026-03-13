@@ -5,6 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.josveronez.desafio_astentask.domain.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    private static final Logger log = LoggerFactory.getLogger(TokenService.class);
     private final Map<String, Instant> revokedTokens = new ConcurrentHashMap<>();
 
     public String generateToken(User user) {
@@ -37,6 +40,7 @@ public class TokenService {
     public String validateToken(String token) {
         try {
             if (isRevoked(token)) {
+                log.debug("event = token_rejected reason = revoked");
                 return null;
             }
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -46,6 +50,7 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
+            log.debug("event=token_rejected reason=invalid");
             return null;
         }
     }
@@ -69,9 +74,11 @@ public class TokenService {
     }
 
     public void revokeToken(String token) {
+        String subject = extractSubject(token);
         Instant expiresAt = extractExpiration(token);
         if (expiresAt != null) {
             revokedTokens.put(token, expiresAt);
+            log.info("event=token_revoked subject={}", subject != null ? subject : "unknown");
         }
     }
 

@@ -22,19 +22,23 @@ public class BrasilApiService {
         this.restClient = builder.baseUrl("https://brasilapi.com.br/api").build();
     }
 
-
     @Cacheable(value = "feriados", key = "#ano")
     public List<BrasilAPIResponseDTO> buscarFeriados(int ano) {
-        return restClient.get()
-                .uri("/feriados/v1/{ano}", ano)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new ExternalAPIException("Feriados para o ano " + ano + " não encontrados na API externa.");
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    throw new ExternalAPIException("Erro de comunicação com o serviço de feriados.");
-                })
-                .body(new ParameterizedTypeReference<List<BrasilAPIResponseDTO>>() {});
+        log.info("event=external_api_call api=brasilapi feriados ano={}", ano);
+        try {
+            return restClient.get()
+                    .uri("/feriados/v1/{ano}", ano)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        throw new ExternalAPIException("Feriados para o ano " + ano + " não encontrados na API externa.");
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                        throw new ExternalAPIException("Erro de comunicação com o serviço de feriados.");
+                    })
+                    .body(new ParameterizedTypeReference<List<BrasilAPIResponseDTO>>() {});
+        } catch (ExternalAPIException e) {
+            log.error("event=external_api_error api=brasilapi feriados ano={} message={}", ano, e.getMessage());
+            throw e;
+        }
     }
-
 }
