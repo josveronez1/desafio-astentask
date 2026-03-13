@@ -40,7 +40,7 @@ public class AuthController {
     public ResponseEntity<UserResponseDTO> register(@RequestBody @Valid UserRequestDTO request) {
         UserResponseDTO saved = userService.save(request);
         log.info("event=user_registered email={} userId={}", request.email(), saved.id());
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @Operation(summary = "Realizar login")
