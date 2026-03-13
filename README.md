@@ -160,3 +160,71 @@ Acredito que a partir dele consegui aprofundar meus conhecimentos na linguagem J
 - Utilização de forma consciente de IA, utilizei o gemini (ferramenta mais simples) como um "professor / parceiro dev", que forneceu ajuda para entender melhor conceitos e 
 como eles se conectam e code snippets para pegar sintaxe. Nenhum "agente autônomo" utilizado para escrever código.
 Busquei utilizar a ferramenta somente como facilitadora para uma aprendizagem e desenvolvimento mais rápidos.
+
+
+## Diagrama Database
+```mermaid
+erDiagram
+    USERS {
+        Long id PK
+        String name
+        String email
+        String password
+        UserRole role
+        LocalDateTime created_at
+        LocalDateTime updated_at
+    }
+
+    PROJECTS {
+        Long id PK
+        String name
+        String description
+        ProjectStatus status
+        Long owner_id FK
+        LocalDateTime created_at
+        LocalDateTime updated_at
+    }
+
+    TASKS {
+        Long id PK
+        String title
+        String description
+        TaskStatus status
+        TaskPriority priority
+        Long project_id FK
+        Long assignee_id FK
+        Long reporter_id FK
+        Double estimated_hours
+        Double actual_hours
+        LocalDateTime due_date
+        LocalDateTime created_at
+        LocalDateTime updated_at
+    }
+
+    COMMENTS {
+        Long id PK
+        String content
+        Long task_id FK
+        Long author_id FK
+        LocalDateTime created_at
+    }
+
+    TIME_LOG {
+        Long id PK
+        Long task_id FK
+        Long user_id FK
+        Double hours_worked
+        String description
+        LocalDateTime log_date
+    }
+
+    USERS ||--o{ PROJECTS : "owner"
+    USERS ||--o{ TASKS : "assignee"
+    USERS ||--o{ TASKS : "reporter"
+    USERS ||--o{ COMMENTS : "author"
+    USERS ||--o{ TIME_LOG : "logs"
+
+    PROJECTS ||--o{ TASKS : "project"
+
+    TASKS ||--o{ COMMENTS : "comments"
+    TASKS ||--o{ TIME_LOG : "time logs"
