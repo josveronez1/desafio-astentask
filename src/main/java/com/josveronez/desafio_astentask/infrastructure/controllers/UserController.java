@@ -4,6 +4,7 @@ import com.josveronez.desafio_astentask.business.dto.UserRequestDTO;
 import com.josveronez.desafio_astentask.business.dto.UserResponseDTO;
 import com.josveronez.desafio_astentask.business.dto.UserUpdateDTO;
 import com.josveronez.desafio_astentask.business.services.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Hidden
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
